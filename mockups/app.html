@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChiefOS - AI Chief of Staff</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Scripts -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Dark Theme Colors */
+            --bg-dark: #050508;
+            --bg-card: #0d0d14;
+            --bg-elevated: #13131c;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --accent-transparent: rgba(59, 130, 246, 0.1);
+            
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #475569;
+            
+            --success: #22c55e;
+            --success-bg: rgba(34, 197, 94, 0.1);
+            --warning: #f59e0b;
+            --warning-bg: rgba(245, 158, 11, 0.1);
+            --error: #ef4444;
+            --error-bg: rgba(239, 68, 68, 0.1);
+            --purple: #a855f7;
+            --purple-bg: rgba(168, 85, 247, 0.1);
+            
+            /* Sizing */
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 72px;
+            --header-height: 70px;
+        }
+
+        body.light-mode {
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-elevated: #f1f5f9;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --card-bg: #ffffff;
+            
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+        /* Typography & Utilities */
+        h1, h2, h3, h4, h5, h6 { font-weight: 600; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-muted { color: var(--text-muted); }
+        .text-secondary { color: var(--text-secondary); }
+        .font-semibold { font-weight: 600; }
+        .font-medium { font-weight: 500; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .grid { display: grid; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .cursor-pointer { cursor: pointer; }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Avatar */
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-elevated);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar.sm { width: 24px; height: 24px; font-size: 0.75rem; }
+        .avatar.lg { width: 48px; height: 48px; font-size: 1.25rem; }
+
+        /* Buttons */
+        .btn {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background: var(--border);
+            border-color: var(--border-hover);
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+            box-shadow: 0 6px 16px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+        .btn-icon {
+            padding: 8px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-icon:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        /* Inputs */
+        .input-group { position: relative; display: flex; align-items: center; }
+        .input-group i { position: absolute; left: 12px; color: var(--text-muted); width: 16px; height: 16px; }
+        .input {
+            width: 100%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-transparent);
+        }
+        .input.with-icon { padding-left: 36px; }
+
+        /* Badges */
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge.success { background: var(--success-bg); color: var(--success); }
+        .badge.warning { background: var(--warning-bg); color: var(--warning); }
+        .badge.error { background: var(--error-bg); color: var(--error); }
+        .badge.purple { background: var(--purple-bg); color: var(--purple); }
+        .badge.blue { background: var(--accent-transparent); color: var(--accent); }
+
+        /* Card */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-hover);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        /* Layout */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+        }
+        .sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+        
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+        .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.25rem; color: var(--text-primary); }
+        .logo i { color: var(--accent); }
+        .sidebar.collapsed .logo span { display: none; }
+        
+        .nav-list { flex: 1; padding: 20px 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .nav-item i { width: 20px; height: 20px; }
+        .nav-item:hover { background: var(--bg-elevated); color: var(--text-primary); }
+        .nav-item.active { background: var(--accent-transparent); color: var(--accent); border-right: 3px solid var(--accent); border-radius: 8px 0 0 8px; }
+        .sidebar.collapsed .nav-item span { display: none; }
+        .sidebar.collapsed .nav-item { justify-content: center; }
+        
+        .upgrade-card {
+            margin: 20px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid var(--accent-transparent);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .sidebar.collapsed .upgrade-card { display: none; }
+        
+        .user-section {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .user-section:hover { background: var(--bg-elevated); }
+        .user-info { display: flex; flex-direction: column; overflow: hidden; }
+        .user-info .name { font-weight: 600; font-size: 0.875rem; white-space: nowrap; }
+        .user-info .role { font-size: 0.75rem; color: var(--text-secondary); }
+        .sidebar.collapsed .user-info { display: none; }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Top Header */
+        .top-header {
+            height: var(--header-height);
+            background: rgba(13, 13, 20, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            z-index: 50;
+        }
+        
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+        
+        /* Section Management */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease forwards;
+        }
+        .section.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard Specific */
+        .stat-card { display: flex; flex-direction: column; gap: 8px; }
+        .stat-card .value { font-size: 1.75rem; font-weight: 700; color: var(--text-primary); }
+        .stat-card .label { font-size: 0.875rem; color: var(--text-secondary); }
+        .stat-card .trend { display: flex; align-items: center; gap: 4px; font-size: 0.75rem; }
+        .stat-card .trend.up { color: var(--success); }
+        .stat-card .trend.down { color: var(--error); }
+
+        .chart-container { position: relative; height: 300px; width: 100%; }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: var(--bg-elevated); border-radius: 8px; }
+        
+        .ai-insight {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), transparent);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 12px;
+        }
+
+        /* AI Chat Specific */
+        .chat-layout { display: flex; height: calc(100vh - var(--header-height) - 48px); gap: 20px; }
+        .chat-sidebar { width: 260px; display: flex; flex-direction: column; gap: 16px; border-right: 1px solid var(--border); padding-right: 20px; }
+        .chat-main { flex: 1; display: flex; flex-direction: column; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+        
+        .message { display: flex; gap: 16px; max-width: 85%; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .message .bubble { padding: 16px; border-radius: 16px; font-size: 0.9375rem; line-height: 1.5; }
+        .message.user .bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+        .message.ai .bubble { background: var(--bg-elevated); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+        
+        .chat-input-area { padding: 20px; border-top: 1px solid var(--border); background: var(--bg-card); }
+        .chat-input-wrapper { display: flex; align-items: center; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 24px; padding: 8px 16px; transition: border-color 0.2s; }
+        .chat-input-wrapper:focus-within { border-color: var(--accent); }
+        .chat-input { flex: 1; background: transparent; border: none; color: var(--text-primary); padding: 8px; font-size: 0.9375rem; outline: none; }
+        
+        .typing-dots { display: flex; gap: 4px; padding: 8px 12px; }
+        .dot { width: 6px; height: 6px; background: var(--text-secondary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* Tasks Kanban */
+        .kanban-board { display: flex; gap: 20px; height: calc(100vh - var(--header-height) - 150px); overflow-x: auto; padding-bottom: 20px; }
+        .kanban-column { min-width: 300px; flex: 1; display: flex; flex-direction: column; background: var(--bg-card); border-radius: 12px; padding: 16px; border: 1px solid var(--border); }
+        .column-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 600; }
+        .task-list { flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+        .task-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 16px; cursor: grab; transition: transform 0.2s; }
+        .task-card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+
+        /* Emails Split View */
+        .email-layout { display: flex; height: calc(100vh - var(--header-height) - 48px); background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .email-sidebar { width: 40%; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+        .email-list { flex: 1; overflow-y: auto; }
+        .email-item { padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+        .email-item:hover { background: var(--bg-elevated); }
+        .email-item.active { background: var(--bg-elevated); border-left: 3px solid var(--accent); }
+        .email-preview-pane { width: 60%; display: flex; flex-direction: column; }
+        
+        /* Settings Tabs */
+        .tabs-header { display: flex; gap: 24px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+        .tab-btn { padding: 12px 0; font-weight: 500; color: var(--text-secondary); cursor: pointer; position: relative; border: none; background: transparent; font-size: 0.9375rem; }
+        .tab-btn.active { color: var(--accent); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 2px 2px 0 0; }
+        
+        /* Table */
+        .table { width: 100%; border-collapse: collapse; }
+        .table th { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-secondary); font-weight: 500; font-size: 0.875rem; }
+        .table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+        .table tr:hover td { background: var(--bg-elevated); }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+        /* Custom Checkbox */
+        .checkbox-wrapper { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+        .checkbox { width: 18px; height: 18px; border: 2px solid var(--text-muted); border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .checkbox-wrapper:hover .checkbox { border-color: var(--accent); }
+        .checkbox.checked { background: var(--accent); border-color: var(--accent); }
+        .checkbox.checked i { color: #fff; width: 12px; height: 12px; }
+
+        /* Integrations */
+        .integration-card { display: flex; flex-direction: column; gap: 16px; height: 100%; }
+        .integration-header { display: flex; gap: 16px; align-items: center; }
+        .integration-logo { width: 48px; height: 48px; background: var(--bg-elevated); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 12px; z-index: 1100; }
+        .toast { background: var(--bg-elevated); border: 1px solid var(--border); border-left: 4px solid var(--accent); padding: 16px 20px; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 12px; animation: slideInRight 0.3s forwards; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        .fade-out { animation: fadeOut 0.3s forwards; }
+        @keyframes fadeOut { to { opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i data-lucide="zap"></i>
+                <span>ChiefOS</span>
+            </div>
+            <button class="btn-icon" onclick="toggleSidebar()">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+
+        <nav class="nav-list">
+            <a class="nav-item active" onclick="switchSection('dashboard', this)">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('chat', this)">
+                <i data-lucide="bot"></i>
+                <span>AI Chat</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('tasks', this)">
+                <i data-lucide="check-square"></i>
+                <span>Tasks</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('reports', this)">
+                <i data-lucide="bar-chart-2"></i>
+                <span>Reports</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('emails', this)">
+                <i data-lucide="mail"></i>
+                <span>Emails</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('calendar', this)">
+                <i data-lucide="calendar"></i>
+                <span>Calendar</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('integrations', this)">
+                <i data-lucide="layers"></i>
+                <span>Integrations</span>
+            </a>
+            <a class="nav-item" onclick="switchSection('settings', this)">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="upgrade-card">
+            <h4 class="text-sm font-semibold text-primary mb-1">Upgrade to Pro</h4>
+            <p class="text-xs text-secondary mb-3">Unlock advanced AI features</p>
+            <button class="btn btn-primary w-full" style="padding: 6px;">Upgrade</button>
+        </div>
+
+        <div class="user-section">
+            <div class="avatar">
+                <img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=3b82f6&color=fff" alt="User">
+            </div>
+            <div class="user-info">
+                <span class="name">Alex Johnson</span>
+                <span class="role">Acme Corp</span>
+            </div>
+            <i data-lucide="chevrons-up-down" style="margin-left: auto; width: 16px; color: var(--text-muted)"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-container">
+        <!-- HEADER -->
+        <header class="top-header">
+            <h2 id="header-title" class="font-semibold text-lg">Dashboard</h2>
+            
+            <div class="flex items-center gap-6">
+                <div class="input-group" style="width: 300px;">
+                    <i data-lucide="search"></i>
+                    <input type="text" class="input with-icon" placeholder="Ask AI or search...">
+                </div>
+                
+                <div class="flex items-center gap-4">
+                    <button class="btn-icon" onclick="toggleTheme()">
+                        <i data-lucide="moon" id="theme-icon"></i>
+                    </button>
+                    <button class="btn-icon" style="position: relative;">
+                        <i data-lucide="bell"></i>
+                        <span style="position: absolute; top: 4px; right: 4px; background: var(--error); width: 8px; height: 8px; border-radius: 50%;"></span>
+                    </button>
+                    <div class="avatar sm cursor-pointer">
+                        <img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=3b82f6&color=fff" alt="User">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECTIONS CONTAINER -->
+        <div class="content-area" id="content-area">
+            
+            <!-- SECTION: DASHBOARD -->
+            <section id="dashboard" class="section active">
+                <div class="grid grid-4 gap-6 mb-6">
+                    <div class="card stat-card">
+                        <div class="flex justify-between items-start">
+                            <span class="label">Business Health</span>
+                            <i data-lucide="activity" class="text-accent"></i>
+                        </div>
+                        <div class="value">87/100</div>
+                        <div class="trend up"><i data-lucide="trending-up" style="width:14px"></i> Excellent status</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="flex justify-between items-start">
+                            <span class="label">Tasks Completed</span>
+                            <i data-lucide="check-circle" class="text-success"></i>
+                        </div>
+                        <div class="value">24/31</div>
+                        <div class="w-full bg-elevated" style="height: 6px; border-radius: 3px; margin-top: 8px;">
+                            <div class="bg-success h-full" style="width: 77%; border-radius: 3px; background: var(--success)"></div>
+                        </div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="flex justify-between items-start">
+                            <span class="label">Emails Processed</span>
+                            <i data-lucide="mail" class="text-purple"></i>
+                        </div>
+                        <div class="value">128</div>
+                        <div class="trend up"><i data-lucide="arrow-up-right" style="width:14px"></i> 12% this week</div>
+                    </div>
+                    <div class="card stat-card">
+                        <div class="flex justify-between items-start">
+                            <span class="label">Revenue (Month)</span>
+                            <i data-lucide="dollar-sign" class="text-warning"></i>
+                        </div>
+                        <div class="value">$48,200</div>
+                        <div class="trend up"><i data-lucide="trending-up" style="width:14px"></i> 8% above target</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 gap-6 mb-6">
+                    <div class="card">
+                        <h3 class="font-semibold mb-4 text-sm text-secondary">Revenue Trend (6 Months)</h3>
+                        <div class="chart-container">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="font-semibold mb-4 text-sm text-secondary">Team Productivity</h3>
+                        <div class="chart-container">
+                            <canvas id="productivityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-3 gap-6 mb-6">
+                    <div class="card">
+                        <h3 class="font-semibold mb-4 flex items-center justify-between">
+                            Today's Priorities
+                            <button class="btn-icon"><i data-lucide="plus"></i></button>
+                        </h3>
+                        <div class="flex flex-col gap-2">
+                            <div class="checkbox-wrapper list-item">
+                                <div class="checkbox"><i data-lucide="check" style="display:none"></i></div>
+                                <span class="flex-1 text-sm">Review Q3 marketing proposal</span>
+                                <span class="badge error">HIGH</span>
+                            </div>
+                            <div class="checkbox-wrapper list-item">
+                                <div class="checkbox"><i data-lucide="check" style="display:none"></i></div>
+                                <span class="flex-1 text-sm">Follow up with Acme Corp</span>
+                                <span class="badge error">URGENT</span>
+                            </div>
+                            <div class="checkbox-wrapper list-item">
+                                <div class="checkbox"><i data-lucide="check" style="display:none"></i></div>
+                                <span class="flex-1 text-sm">Team standup at 10am</span>
+                                <span class="badge blue">MEETING</span>
+                            </div>
+                            <div class="checkbox-wrapper list-item">
+                                <div class="checkbox"><i data-lucide="check" style="display:none"></i></div>
+                                <span class="flex-1 text-sm">Approve design mockups</span>
+                                <span class="badge warning">MEDIUM</span>
+                            </div>
+                            <div class="checkbox-wrapper list-item">
+                                <div class="checkbox"><i data-lucide="check" style="display:none"></i></div>
+                                <span class="flex-1 text-sm">Send invoice to ClientCo</span>
+                                <span class="badge error">HIGH</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="font-semibold mb-4">Upcoming Meetings</h3>
+                        <div class="flex flex-col">
+                            <div class="list-item flex-col items-start gap-1">
+                                <div class="font-medium text-sm">Product Sync</div>
+                                <div class="text-xs text-secondary flex items-center gap-2">
+                                    <i data-lucide="clock" style="width:12px"></i> 10:00 AM • 4 attendees
+                                </div>
+                            </div>
+                            <div class="list-item flex-col items-start gap-1">
+                                <div class="font-medium text-sm">Client Call (Nexus)</div>
+                                <div class="text-xs text-secondary flex items-center gap-2">
+                                    <i data-lucide="clock" style="width:12px"></i> 2:00 PM • 2 attendees
+                                </div>
+                            </div>
+                            <div class="list-item flex-col items-start gap-1">
+                                <div class="font-medium text-sm">Weekly Review</div>
+                                <div class="text-xs text-secondary flex items-center gap-2">
+                                    <i data-lucide="clock" style="width:12px"></i> 4:30 PM • Team
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn w-full mt-4">View Calendar</button>
+                    </div>
+
+                    <div class="card" style="border-color: var(--accent-transparent);">
+                        <h3 class="font-semibold mb-4 flex items-center gap-2 gradient-text">
+                            <i data-lucide="sparkles"></i> AI Insights
+                        </h3>
+                        <div class="ai-insight">
+                            <i data-lucide="trending-up" class="text-accent" style="min-width:20px"></i>
+                            <div class="text-sm">Revenue is trending 8% above target this week based on recent Stripe sync.</div>
+                        </div>
+                        <div class="ai-insight">
+                            <i data-lucide="message-square" class="text-warning" style="min-width:20px"></i>
+                            <div class="text-sm">Marcus hasn't replied to your email for 3 days — follow up recommended.</div>
+                        </div>
+                        <div class="ai-insight">
+                            <i data-lucide="alert-circle" class="text-error" style="min-width:20px"></i>
+                            <div class="text-sm">4 tasks are due today and 2 are overdue in your pipeline.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: AI CHAT -->
+            <section id="chat" class="section h-full">
+                <div class="chat-layout">
+                    <div class="chat-sidebar">
+                        <button class="btn btn-primary w-full justify-center mb-4"><i data-lucide="plus"></i> New Chat</button>
+                        <h4 class="text-xs text-secondary font-semibold uppercase mb-2">Recent Chats</h4>
+                        <div class="flex flex-col gap-2">
+                            <div class="list-item cursor-pointer text-sm" style="padding: 8px 12px; background: var(--bg-elevated); border-radius: 8px;">Today's Briefing</div>
+                            <div class="list-item cursor-pointer text-sm" style="padding: 8px 12px;">Customer Follow-ups</div>
+                            <div class="list-item cursor-pointer text-sm" style="padding: 8px 12px;">Weekly Report Request</div>
+                            <div class="list-item cursor-pointer text-sm" style="padding: 8px 12px;">Task Analysis</div>
+                            <div class="list-item cursor-pointer text-sm" style="padding: 8px 12px;">Revenue Summary</div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-main">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="message user">
+                                <div class="avatar"><img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=3b82f6&color=fff"></div>
+                                <div class="bubble">What should I focus on today?</div>
+                            </div>
+                            <div class="message ai">
+                                <div class="avatar" style="background: var(--purple); color: #fff;"><i data-lucide="bot"></i></div>
+                                <div class="bubble">
+                                    <p class="mb-3">Good morning, Alex. Based on your calendar, emails, and tasks, here are your top priorities for today:</p>
+                                    <ol style="padding-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                                        <li><strong>Review Q3 Marketing Proposal:</strong> Needed for tomorrow's executive review.</li>
+                                        <li><strong>Follow up with Acme Corp:</strong> Their contract renewal is pending.</li>
+                                        <li><strong>Product Sync (10:00 AM):</strong> You have 4 attendees waiting on the roadmap update.</li>
+                                    </ol>
+                                    <p class="mt-3 text-sm text-secondary">Would you like me to draft an email to Acme Corp?</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4" style="border-top: 1px solid var(--border);">
+                            <div class="grid grid-3 gap-3 mb-4">
+                                <div class="btn justify-start text-xs text-secondary" onclick="insertPrompt('Show overdue tasks')">"Show overdue tasks"</div>
+                                <div class="btn justify-start text-xs text-secondary" onclick="insertPrompt('Summarize my emails')">"Summarize my emails"</div>
+                                <div class="btn justify-start text-xs text-secondary" onclick="insertPrompt('Who needs follow-up?')">"Who needs follow-up?"</div>
+                            </div>
+                            <div class="chat-input-wrapper">
+                                <button class="btn-icon"><i data-lucide="paperclip"></i></button>
+                                <input type="text" id="chat-input" class="chat-input" placeholder="Ask ChiefOS anything..." onkeypress="handleChatKey(event)">
+                                <button class="btn btn-primary" style="padding: 6px 12px; border-radius: 20px;" onclick="sendChatMessage()">
+                                    <i data-lucide="send" style="width:16px;"></i>
+                                </button>
+                            </div>
+                            <div class="text-center text-xs text-muted mt-2">Powered by Gemini 1.5 Pro</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: TASKS -->
+            <section id="tasks" class="section h-full">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex gap-2 bg-elevated p-1" style="border-radius: 10px; border: 1px solid var(--border);">
+                        <button class="btn" style="background: var(--bg-card); border-color: transparent;">Kanban</button>
+                        <button class="btn" style="border-color: transparent;">List</button>
+                        <button class="btn" style="border-color: transparent;">Calendar</button>
+                    </div>
+                    <div class="flex gap-3">
+                        <button class="btn"><i data-lucide="filter"></i> Filter</button>
+                        <button class="btn"><i data-lucide="sparkles" class="text-purple"></i> AI Suggest</button>
+                        <button class="btn btn-primary" onclick="showTaskModal()"><i data-lucide="plus"></i> New Task</button>
+                    </div>
+                </div>
+
+                <div class="kanban-board">
+                    <!-- Todo Column -->
+                    <div class="kanban-column">
+                        <div class="column-header">
+                            <span class="flex items-center gap-2"><span class="badge" style="background:var(--text-secondary)">4</span> Todo</span>
+                            <button class="btn-icon"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="task-list">
+                            <div class="task-card card">
+                                <div class="flex justify-between mb-2"><span class="badge error">High</span><span class="text-xs text-secondary">Jun 15</span></div>
+                                <h4 class="font-medium text-sm mb-3">Q4 Marketing Plan</h4>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-xs text-muted">Marketing</span>
+                                    <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Sarah+Chen&background=a855f7&color=fff"></div>
+                                </div>
+                            </div>
+                            <div class="task-card card">
+                                <div class="flex justify-between mb-2"><span class="badge warning">Medium</span><span class="text-xs text-secondary">Jun 16</span></div>
+                                <h4 class="font-medium text-sm mb-3">Update client contracts</h4>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-xs text-muted">Legal</span>
+                                    <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=3b82f6&color=fff"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- In Progress Column -->
+                    <div class="kanban-column">
+                        <div class="column-header">
+                            <span class="flex items-center gap-2"><span class="badge blue">3</span> In Progress</span>
+                            <button class="btn-icon"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="task-list">
+                            <div class="task-card card" style="border-color: var(--accent);">
+                                <div class="flex justify-between mb-2"><span class="badge error">Urgent</span><span class="text-xs text-secondary">Today</span></div>
+                                <h4 class="font-medium text-sm mb-3">Build landing page</h4>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-xs text-muted">Development</span>
+                                    <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Marcus+R&background=22c55e&color=fff"></div>
+                                </div>
+                            </div>
+                            <div class="task-card card">
+                                <div class="flex justify-between mb-2"><span class="badge blue">Low</span><span class="text-xs text-secondary">Jun 18</span></div>
+                                <h4 class="font-medium text-sm mb-3">Quarterly report</h4>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-xs text-muted">Finance</span>
+                                    <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=3b82f6&color=fff"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Column -->
+                    <div class="kanban-column">
+                        <div class="column-header">
+                            <span class="flex items-center gap-2"><span class="badge warning">2</span> Review</span>
+                            <button class="btn-icon"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="task-list">
+                            <div class="task-card card">
+                                <div class="flex justify-between mb-2"><span class="badge warning">Medium</span><span class="text-xs text-secondary">Tomorrow</span></div>
+                                <h4 class="font-medium text-sm mb-3">Invoice template</h4>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-xs text-muted">Design</span>
+                                    <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Sarah+Chen&background=a855f7&color=fff"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Done Column -->
+                    <div class="kanban-column">
+                        <div class="column-header">
+                            <span class="flex items-center gap-2"><span class="badge success">3</span> Done</span>
+                            <button class="btn-icon"><i data-lucide="plus"></i></button>
+                        </div>
+                        <div class="task-list" style="opacity: 0.7;">
+                            <div class="task-card card">
+                                <h4 class="font-medium text-sm mb-3 text-secondary" style="text-decoration: line-through;">Hire designer</h4>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="badge success">Done</span>
+                                </div>
+                            </div>
+                            <div class="task-card card">
+                                <h4 class="font-medium text-sm mb-3 text-secondary" style="text-decoration: line-through;">Setup CRM</h4>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="badge success">Done</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: REPORTS -->
+            <section id="reports" class="section">
+                <div class="flex gap-4 mb-6 overflow-x-auto pb-2">
+                    <button class="btn">Daily</button>
+                    <button class="btn btn-primary">Weekly</button>
+                    <button class="btn">Monthly</button>
+                    <button class="btn">Team</button>
+                    <button class="btn">Sales</button>
+                </div>
+
+                <div class="card mb-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-xl font-semibold">Weekly Business Report</h2>
+                            <p class="text-secondary text-sm">Jun 9 - 14, 2026</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="btn"><i data-lucide="download"></i> PDF</button>
+                            <button class="btn"><i data-lucide="file-spreadsheet"></i> CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-elevated p-4 rounded-lg mb-6 border border-border">
+                        <div class="flex gap-3 mb-2">
+                            <i data-lucide="sparkles" class="text-purple"></i>
+                            <h4 class="font-semibold text-sm">AI Executive Summary</h4>
+                        </div>
+                        <p class="text-sm text-secondary leading-relaxed">
+                            This week showed strong performance across all metrics. Revenue is up 12% compared to last week, largely driven by the successful launch of the new enterprise tier. Team productivity remains high, with 85% of assigned tasks completed on time. I recommend focusing on customer follow-ups next week, as our response time has slightly dipped to 4.2 hours.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-2 gap-6">
+                        <div class="card bg-dark">
+                            <h4 class="font-medium text-sm mb-4">Task Completion Rate</h4>
+                            <div style="height: 200px; display: flex; justify-content: center;">
+                                <canvas id="reportsDonutChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="card bg-dark">
+                            <h4 class="font-medium text-sm mb-4">Revenue Breakdown</h4>
+                            <div style="height: 200px;">
+                                <canvas id="reportsBarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: EMAILS -->
+            <section id="emails" class="section h-full">
+                <div class="email-layout">
+                    <div class="email-sidebar">
+                        <div class="p-4 border-b border-border bg-elevated">
+                            <div class="flex gap-2 overflow-x-auto" style="scrollbar-width: none;">
+                                <span class="badge blue cursor-pointer">All</span>
+                                <span class="badge cursor-pointer" style="background:var(--bg-card); border: 1px solid var(--border)">Important</span>
+                                <span class="badge cursor-pointer" style="background:var(--bg-card); border: 1px solid var(--border)">Unread</span>
+                                <span class="badge cursor-pointer" style="background:var(--bg-card); border: 1px solid var(--border)">Customers</span>
+                            </div>
+                        </div>
+                        <div class="email-list">
+                            <!-- Email Item 1 (Active) -->
+                            <div class="email-item active" onclick="selectEmail(this)">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="font-semibold text-sm">Sarah (Acme Corp)</span>
+                                    <span class="text-xs text-secondary">2h ago</span>
+                                </div>
+                                <div class="font-medium text-sm mb-1 text-primary">Re: Contract Renewal</div>
+                                <div class="text-xs text-secondary truncate">Hi Alex, we've reviewed the proposal and have a few...</div>
+                                <div class="mt-2 flex gap-2">
+                                    <span class="badge error">URGENT</span>
+                                </div>
+                            </div>
+                            <!-- Email Item 2 -->
+                            <div class="email-item" onclick="selectEmail(this)">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="font-semibold text-sm">Marcus Johnson</span>
+                                    <span class="text-xs text-secondary">5h ago</span>
+                                </div>
+                                <div class="font-medium text-sm mb-1">Q3 Proposal Status</div>
+                                <div class="text-xs text-secondary truncate">Just checking in on the status of the Q3 proposal...</div>
+                                <div class="mt-2 flex gap-2">
+                                    <span class="badge warning">FOLLOW-UP</span>
+                                </div>
+                            </div>
+                            <!-- Email Item 3 -->
+                            <div class="email-item" onclick="selectEmail(this)">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="font-semibold text-sm">Stripe</span>
+                                    <span class="text-xs text-secondary">8h ago</span>
+                                </div>
+                                <div class="font-medium text-sm mb-1">Payment received $4,200</div>
+                                <div class="text-xs text-secondary truncate">Great news! You just received a payment from ClientCo.</div>
+                                <div class="mt-2 flex gap-2">
+                                    <span class="badge success">INFO</span>
+                                </div>
+                            </div>
+                            <!-- Email Item 4 -->
+                            <div class="email-item" onclick="selectEmail(this)">
+                                <div class="flex justify-between items-start mb-1">
+                                    <span class="font-semibold text-sm">Jennifer Lee</span>
+                                    <span class="text-xs text-secondary">Yesterday</span>
+                                </div>
+                                <div class="font-medium text-sm mb-1">Team meeting agenda</div>
+                                <div class="text-xs text-secondary truncate">Here is the agenda for tomorrow's team sync...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="email-preview-pane">
+                        <div class="p-6 border-b border-border flex justify-between items-center">
+                            <div class="flex gap-2">
+                                <button class="btn-icon" title="Archive"><i data-lucide="archive"></i></button>
+                                <button class="btn-icon" title="Mark Unread"><i data-lucide="mail"></i></button>
+                                <button class="btn-icon" title="Delete"><i data-lucide="trash-2"></i></button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn"><i data-lucide="reply"></i> Reply</button>
+                                <button class="btn"><i data-lucide="forward"></i> Forward</button>
+                            </div>
+                        </div>
+                        <div class="p-6 overflow-y-auto flex-1">
+                            <div class="flex justify-between items-start mb-6">
+                                <h2 class="text-xl font-semibold">Re: Contract Renewal</h2>
+                                <span class="badge success bg-success-bg"><i data-lucide="smile" style="width:14px"></i> Positive Sentiment</span>
+                            </div>
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="avatar"><img src="https://ui-avatars.com/api/?name=Sarah&background=random"></div>
+                                <div>
+                                    <div class="font-semibold text-sm">Sarah from Acme Corp <span class="text-secondary font-normal">&lt;sarah@acme.com&gt;</span></div>
+                                    <div class="text-xs text-secondary">To: me, billing@chiefos.com • Jun 14, 2026, 7:24 AM</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-elevated p-4 rounded-lg mb-6 border border-accent-transparent" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), transparent);">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex gap-2 items-center">
+                                        <i data-lucide="sparkles" class="text-accent"></i>
+                                        <h4 class="font-semibold text-sm">AI Summary</h4>
+                                    </div>
+                                    <button class="btn btn-primary" style="padding: 4px 12px; font-size: 0.75rem;"><i data-lucide="pen-tool" style="width:14px"></i> Draft Reply</button>
+                                </div>
+                                <p class="text-sm text-secondary">Sarah approved the general terms of the renewal but requested a minor revision on clause 4.2 regarding support SLA. She is ready to sign once updated.</p>
+                            </div>
+
+                            <div class="text-sm leading-relaxed whitespace-pre-line text-secondary">
+                                Hi Alex,
+
+                                We've reviewed the proposal with the legal team. Everything looks great overall, and we're excited to continue our partnership for another year.
+
+                                Before we sign, could we request a minor revision to clause 4.2? We'd like to explicitly state that the support SLA guarantees a 2-hour response time for critical issues.
+
+                                Let me know if that's doable. If so, send over the updated Docusign and I'll get it executed today.
+
+                                Best,
+                                Sarah
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: CALENDAR -->
+            <section id="calendar" class="section h-full">
+                <div class="flex gap-6 h-full">
+                    <div class="flex-1 card flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-xl font-semibold">June 2026</h2>
+                            <div class="flex gap-2">
+                                <button class="btn-icon"><i data-lucide="chevron-left"></i></button>
+                                <button class="btn">Today</button>
+                                <button class="btn-icon"><i data-lucide="chevron-right"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-7 gap-1 text-center font-medium text-sm mb-2 text-secondary" style="grid-template-columns: repeat(7, 1fr);">
+                            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                        </div>
+                        <div class="grid grid-7 gap-1 flex-1" style="grid-template-columns: repeat(7, 1fr);">
+                            <!-- Mocking just a few calendar cells for layout -->
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px] opacity-50">31</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">1</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">2</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">3</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">4</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">5</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">6</div>
+                            
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">7</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">8</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">9</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">10</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">11</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">12</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">13</div>
+                            
+                            <div class="bg-elevated p-2 rounded border border-accent min-h-[100px] relative" style="background: var(--card-bg);">
+                                <span class="bg-accent text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mb-2">14</span>
+                                <div class="bg-accent-transparent text-accent text-xs p-1 rounded truncate mb-1 border border-accent-transparent">10am Product Sync</div>
+                                <div class="bg-purple-bg text-purple text-xs p-1 rounded truncate mb-1 border border-border">2pm Nexus Call</div>
+                            </div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">15</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">16</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">17</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">18</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">19</div>
+                            <div class="bg-elevated p-2 rounded border border-border min-h-[100px]">20</div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-80 flex flex-col gap-4">
+                        <button class="btn btn-primary w-full"><i data-lucide="plus"></i> Schedule Meeting</button>
+                        
+                        <div class="card">
+                            <h3 class="font-semibold mb-4 text-sm">Today's Schedule</h3>
+                            <div class="flex flex-col gap-4 relative">
+                                <div class="absolute left-[7px] top-2 bottom-2 w-[2px] bg-border"></div>
+                                
+                                <div class="relative pl-6">
+                                    <div class="absolute left-0 top-1 w-4 h-4 rounded-full bg-accent border-4 border-card-bg"></div>
+                                    <div class="font-medium text-sm">10:00 AM</div>
+                                    <div class="text-sm text-secondary">Product Sync (30m)</div>
+                                </div>
+                                <div class="relative pl-6">
+                                    <div class="absolute left-0 top-1 w-4 h-4 rounded-full bg-purple border-4 border-card-bg"></div>
+                                    <div class="font-medium text-sm">2:00 PM</div>
+                                    <div class="text-sm text-secondary">Client Call: Nexus Corp</div>
+                                </div>
+                                <div class="relative pl-6">
+                                    <div class="absolute left-0 top-1 w-4 h-4 rounded-full bg-border border-4 border-card-bg"></div>
+                                    <div class="font-medium text-sm">4:30 PM</div>
+                                    <div class="text-sm text-secondary">Weekly Team Review</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" style="border-color: var(--purple); background: linear-gradient(180deg, var(--purple-bg), transparent);">
+                            <h3 class="font-semibold mb-2 flex gap-2 items-center text-sm"><i data-lucide="bot" class="text-purple"></i> AI Meeting Prep</h3>
+                            <p class="text-xs text-secondary leading-relaxed">
+                                Before your 2pm call with Nexus: They last purchased in Feb. There is a pending invoice of $12k. They raised a support ticket yesterday regarding API limits.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: INTEGRATIONS -->
+            <section id="integrations" class="section">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h2 class="text-2xl font-semibold mb-1">Connect your tools</h2>
+                        <p class="text-secondary text-sm">Sync your data to enable powerful AI insights.</p>
+                    </div>
+                    <button class="btn"><i data-lucide="key"></i> Manage API Keys</button>
+                </div>
+
+                <h3 class="font-semibold text-sm mb-4 text-secondary uppercase">Connected Apps</h3>
+                <div class="grid grid-3 gap-6 mb-8">
+                    <div class="card integration-card" style="border-color: var(--success);">
+                        <div class="integration-header">
+                            <div class="integration-logo"><i data-lucide="mail" class="text-error"></i></div>
+                            <div>
+                                <h4 class="font-semibold">Google Workspace</h4>
+                                <div class="text-xs text-success flex items-center gap-1"><i data-lucide="check-circle" style="width:12px"></i> Connected</div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-secondary flex-1">Gmail, Calendar, and Drive integration.</p>
+                        <div class="text-xs text-muted">Sync: 2 min ago</div>
+                    </div>
+                    <div class="card integration-card" style="border-color: var(--success);">
+                        <div class="integration-header">
+                            <div class="integration-logo"><i data-lucide="credit-card" class="text-purple"></i></div>
+                            <div>
+                                <h4 class="font-semibold">Stripe</h4>
+                                <div class="text-xs text-success flex items-center gap-1"><i data-lucide="check-circle" style="width:12px"></i> Connected</div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-secondary flex-1">Revenue analytics and billing history.</p>
+                        <div class="text-xs text-muted">Sync: 1 hour ago</div>
+                    </div>
+                </div>
+
+                <h3 class="font-semibold text-sm mb-4 text-secondary uppercase">Available Apps</h3>
+                <div class="grid grid-4 gap-6">
+                    <!-- Cards -->
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="slack" class="text-accent"></i></div>
+                            <h4 class="font-semibold">Slack</h4>
+                        </div>
+                        <button class="btn w-full mt-auto" onclick="showIntegrationModal('Slack')">Connect</button>
+                    </div>
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="file-text" class="text-primary"></i></div>
+                            <h4 class="font-semibold">Notion</h4>
+                        </div>
+                        <button class="btn w-full mt-auto" onclick="showIntegrationModal('Notion')">Connect</button>
+                    </div>
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="target" class="text-purple"></i></div>
+                            <h4 class="font-semibold">Linear</h4>
+                        </div>
+                        <button class="btn w-full mt-auto" onclick="showIntegrationModal('Linear')">Connect</button>
+                    </div>
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="box" class="text-warning"></i></div>
+                            <h4 class="font-semibold">HubSpot</h4>
+                        </div>
+                        <button class="btn w-full mt-auto" onclick="showIntegrationModal('HubSpot')">Connect</button>
+                    </div>
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="github"></i></div>
+                            <h4 class="font-semibold">GitHub</h4>
+                        </div>
+                        <button class="btn w-full mt-auto" onclick="showIntegrationModal('GitHub')">Connect</button>
+                    </div>
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="cloud" class="text-accent"></i></div>
+                            <h4 class="font-semibold">Salesforce</h4>
+                        </div>
+                        <button class="btn w-full mt-auto" onclick="showIntegrationModal('Salesforce')">Connect</button>
+                    </div>
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="zap" class="text-warning"></i></div>
+                            <h4 class="font-semibold">Zapier</h4>
+                        </div>
+                        <button class="btn w-full mt-auto" onclick="showIntegrationModal('Zapier')">Connect</button>
+                    </div>
+                    <div class="card integration-card">
+                        <div class="integration-header mb-2">
+                            <div class="integration-logo"><i data-lucide="trello" class="text-accent"></i></div>
+                            <h4 class="font-semibold">Jira</h4>
+                        </div>
+                        <div class="mt-auto text-center"><span class="badge" style="background: var(--bg-elevated);">Coming Soon</span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION: SETTINGS -->
+            <section id="settings" class="section">
+                <div class="tabs-header">
+                    <button class="tab-btn active" onclick="switchSettingsTab('profile', this)">Profile</button>
+                    <button class="tab-btn" onclick="switchSettingsTab('org', this)">Organization</button>
+                    <button class="tab-btn" onclick="switchSettingsTab('team', this)">Team</button>
+                    <button class="tab-btn" onclick="switchSettingsTab('billing', this)">Billing</button>
+                </div>
+
+                <div id="tab-profile" class="tab-content">
+                    <div class="card max-w-2xl">
+                        <h3 class="font-semibold mb-6">Personal Information</h3>
+                        <div class="flex gap-6 items-center mb-6 pb-6 border-b border-border">
+                            <div class="avatar lg"><img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=3b82f6&color=fff"></div>
+                            <div>
+                                <button class="btn btn-primary mb-2">Upload new photo</button>
+                                <div class="text-xs text-secondary">JPG, GIF or PNG. Max size 2MB.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-2 gap-4 mb-6">
+                            <div>
+                                <label class="text-sm font-medium text-secondary mb-2 block">Full Name</label>
+                                <input type="text" class="input" value="Alex Johnson">
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-secondary mb-2 block">Email Address</label>
+                                <input type="email" class="input text-muted" value="alex@acmecorp.com" disabled>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-secondary mb-2 block">Job Title</label>
+                                <input type="text" class="input" value="CEO">
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-secondary mb-2 block">Timezone</label>
+                                <select class="input">
+                                    <option>Pacific Time (PT)</option>
+                                    <option selected>Eastern Time (ET)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h3 class="font-semibold mb-4 mt-8">Notification Preferences</h3>
+                        <div class="flex flex-col gap-4 mb-8">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="font-medium text-sm">Email Notifications</div>
+                                    <div class="text-xs text-secondary">Receive daily digests and critical alerts</div>
+                                </div>
+                                <div class="checkbox-wrapper"><div class="checkbox checked"><i data-lucide="check"></i></div></div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="font-medium text-sm">AI Weekly Digest</div>
+                                    <div class="text-xs text-secondary">Automated summary of your week</div>
+                                </div>
+                                <div class="checkbox-wrapper"><div class="checkbox checked"><i data-lucide="check"></i></div></div>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="font-medium text-sm">Task Reminders</div>
+                                    <div class="text-xs text-secondary">Alerts for upcoming and overdue tasks</div>
+                                </div>
+                                <div class="checkbox-wrapper"><div class="checkbox checked"><i data-lucide="check"></i></div></div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end border-t border-border pt-4">
+                            <button class="btn btn-primary" onclick="showToast('Settings saved successfully', 'success')">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-org" class="tab-content" style="display:none;">
+                    <div class="card">
+                        <h3 class="font-semibold mb-6">Organization Details</h3>
+                        <div class="grid grid-2 gap-4">
+                            <div><label class="text-sm text-secondary mb-1 block">Company Name</label><input type="text" class="input" value="Acme Corp"></div>
+                            <div><label class="text-sm text-secondary mb-1 block">Industry</label><input type="text" class="input" value="Software"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-team" class="tab-content" style="display:none;">
+                    <div class="card mb-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-semibold">Team Members</h3>
+                            <button class="btn btn-primary"><i data-lucide="user-plus"></i> Invite Member</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Alex+Johnson"></div>
+                                            <div><div class="font-medium text-sm">Alex Johnson (You)</div><div class="text-xs text-secondary">alex@acme.com</div></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge purple">Owner</span></td>
+                                    <td><span class="badge success bg-success-bg">Active</span></td>
+                                    <td><button class="btn-icon"><i data-lucide="more-horizontal"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Sarah+Chen"></div>
+                                            <div><div class="font-medium text-sm">Sarah Chen</div><div class="text-xs text-secondary">sarah@acme.com</div></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge blue">Admin</span></td>
+                                    <td><span class="badge success bg-success-bg">Active</span></td>
+                                    <td><button class="btn-icon"><i data-lucide="more-horizontal"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Marcus+R"></div>
+                                            <div><div class="font-medium text-sm">Marcus Rodriguez</div><div class="text-xs text-secondary">marcus@acme.com</div></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge" style="background:var(--bg-elevated)">Member</span></td>
+                                    <td><span class="badge success bg-success-bg">Active</span></td>
+                                    <td><button class="btn-icon"><i data-lucide="more-horizontal"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="avatar sm"><img src="https://ui-avatars.com/api/?name=Priya+Patel"></div>
+                                            <div><div class="font-medium text-sm">Priya Patel</div><div class="text-xs text-secondary">priya@acme.com</div></div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge" style="background:var(--bg-elevated)">Member</span></td>
+                                    <td><span class="badge warning bg-warning-bg">Invited</span></td>
+                                    <td><button class="btn-icon"><i data-lucide="more-horizontal"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="tab-billing" class="tab-content" style="display:none;">
+                    <div class="grid grid-2 gap-6 mb-6">
+                        <div class="card" style="border-color: var(--accent); background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), transparent);">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h3 class="font-semibold text-lg text-accent">Growth Plan</h3>
+                                    <p class="text-sm text-secondary">$49/month</p>
+                                </div>
+                                <span class="badge blue">Current Plan</span>
+                            </div>
+                            <div class="mb-4">
+                                <div class="flex justify-between text-sm mb-1"><span>Users</span><span>3/5</span></div>
+                                <div class="w-full bg-elevated" style="height: 6px; border-radius: 3px;"><div class="bg-accent h-full" style="width: 60%; border-radius: 3px; background: var(--accent)"></div></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-primary flex-1">Manage Subscription</button>
+                                <button class="btn flex-1">Cancel Plan</button>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3 class="font-semibold mb-4">Payment Method</h3>
+                            <div class="flex items-center gap-4 p-4 border border-border rounded-lg mb-4 bg-elevated">
+                                <div class="w-12 h-8 bg-card-bg border border-border rounded flex items-center justify-center font-bold italic text-primary">VISA</div>
+                                <div>
+                                    <div class="font-medium text-sm">Visa ending in 4242</div>
+                                    <div class="text-xs text-secondary">Expires 12/28</div>
+                                </div>
+                            </div>
+                            <button class="btn w-full">Update Payment Method</button>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="font-semibold text-lg">Create New Task</h3>
+                <button class="btn-icon" onclick="hideModal('task-modal')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label class="text-sm font-medium text-secondary mb-1 block">Task Title</label>
+                    <input type="text" class="input" placeholder="e.g. Design new logo">
+                </div>
+                <div>
+                    <label class="text-sm font-medium text-secondary mb-1 block">Description</label>
+                    <textarea class="input" rows="3" placeholder="Task details..."></textarea>
+                </div>
+                <div class="grid grid-2 gap-4">
+                    <div>
+                        <label class="text-sm font-medium text-secondary mb-1 block">Priority</label>
+                        <select class="input">
+                            <option>Low</option><option>Medium</option><option>High</option><option>Urgent</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-secondary mb-1 block">Category</label>
+                        <select class="input">
+                            <option>Marketing</option><option>Design</option><option>Development</option><option>Sales</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary mt-4" onclick="submitTask()">Create Task</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="integration-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="font-semibold text-lg" id="integration-title">Connect Tool</h3>
+                <button class="btn-icon" onclick="hideModal('integration-modal')"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <p class="text-sm text-secondary">Enter your API Key to connect ChiefOS with this tool.</p>
+                <div>
+                    <label class="text-sm font-medium text-secondary mb-1 block">API Key</label>
+                    <input type="password" class="input" placeholder="sk_live_...">
+                </div>
+                <button class="btn btn-primary mt-4" onclick="connectIntegration()">Connect Integration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toasts Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Chart instances
+        let charts = {};
+
+        // Sidebar Navigation
+        function switchSection(sectionId, element) {
+            // Update nav active state
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            
+            // Update Header Title
+            document.getElementById('header-title').innerText = element.querySelector('span').innerText;
+            
+            // Show/Hide Sections
+            document.querySelectorAll('.section').forEach(el => {
+                el.classList.remove('active');
+                el.style.animation = 'none';
+                el.offsetHeight; /* trigger reflow */
+                el.style.animation = null; 
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            // Init charts if needed
+            if(sectionId === 'dashboard') initDashboardCharts();
+            if(sectionId === 'reports') initReportsCharts();
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const icon = document.getElementById('theme-icon');
+            if (document.body.classList.contains('light-mode')) {
+                icon.setAttribute('data-lucide', 'sun');
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+            
+            // Re-render charts for theme colors
+            initDashboardCharts();
+            initReportsCharts();
+        }
+
+        // Settings Tabs
+        function switchSettingsTab(tabId, element) {
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.getElementById('tab-' + tabId).style.display = 'block';
+        }
+
+        // Emails
+        function selectEmail(element) {
+            document.querySelectorAll('.email-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // Modals
+        function showTaskModal() { document.getElementById('task-modal').classList.add('active'); }
+        function showIntegrationModal(name) { 
+            document.getElementById('integration-title').innerText = `Connect ${name}`;
+            document.getElementById('integration-modal').classList.add('active'); 
+        }
+        function hideModal(id) { document.getElementById('integration-modal').classList.remove('active'); document.getElementById('task-modal').classList.remove('active');}
+        
+        function submitTask() {
+            hideModal('task-modal');
+            showToast('Task created successfully', 'success');
+        }
+        function connectIntegration() {
+            hideModal('integration-modal');
+            showToast('Integration connected!', 'success');
+        }
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            const icon = type === 'success' ? '<i data-lucide="check-circle" class="text-success"></i>' : '<i data-lucide="info" class="text-accent"></i>';
+            toast.innerHTML = `${icon} <span class="text-sm font-medium">${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // AI Chat Logic
+        function handleChatKey(e) {
+            if(e.key === 'Enter') sendChatMessage();
+        }
+        function insertPrompt(text) {
+            document.getElementById('chat-input').value = text;
+            sendChatMessage();
+        }
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const chatContainer = document.getElementById('chat-messages');
+            
+            // Add User Message
+            chatContainer.insertAdjacentHTML('beforeend', `
+                <div class="message user" style="animation: fadeIn 0.3s ease;">
+                    <div class="avatar"><img src="https://ui-avatars.com/api/?name=Alex+Johnson&background=3b82f6&color=fff"></div>
+                    <div class="bubble">${text}</div>
+                </div>
+            `);
+            input.value = '';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Show typing indicator
+            const typingId = 'typing-' + Date.now();
+            chatContainer.insertAdjacentHTML('beforeend', `
+                <div class="message ai" id="${typingId}">
+                    <div class="avatar" style="background: var(--purple); color: #fff;"><i data-lucide="bot"></i></div>
+                    <div class="bubble" style="padding: 12px;"><div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>
+                </div>
+            `);
+            lucide.createIcons();
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Mock AI Response
+            setTimeout(() => {
+                document.getElementById(typingId).remove();
+                chatContainer.insertAdjacentHTML('beforeend', `
+                    <div class="message ai" style="animation: fadeIn 0.3s ease;">
+                        <div class="avatar" style="background: var(--purple); color: #fff;"><i data-lucide="bot"></i></div>
+                        <div class="bubble">I've analyzed that for you. Here is a summary of the requested information based on your connected workspace data. Let me know if you need any specific action taken.</div>
+                    </div>
+                `);
+                lucide.createIcons();
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 1500);
+        }
+
+        // Chart.js Configuration & Theme colors
+        function getChartColors() {
+            const isLight = document.body.classList.contains('light-mode');
+            return {
+                text: isLight ? '#475569' : '#94a3b8',
+                grid: isLight ? '#e2e8f0' : 'rgba(255, 255, 255, 0.05)',
+                primary: '#3b82f6',
+                purple: '#a855f7',
+                success: '#22c55e'
+            };
+        }
+
+        function initDashboardCharts() {
+            const colors = getChartColors();
+            Chart.defaults.color = colors.text;
+            Chart.defaults.font.family = "'Inter', sans-serif";
+
+            // Revenue Chart
+            const revCtx = document.getElementById('revenueChart');
+            if(revCtx) {
+                if(charts.revenue) charts.revenue.destroy();
+                charts.revenue = new Chart(revCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Revenue',
+                            data: [32000, 38000, 35000, 42000, 45000, 48200],
+                            borderColor: colors.primary,
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: colors.primary
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: colors.grid, drawBorder: false } },
+                            x: { grid: { display: false, drawBorder: false } }
+                        }
+                    }
+                });
+            }
+
+            // Productivity Chart
+            const prodCtx = document.getElementById('productivityChart');
+            if(prodCtx) {
+                if(charts.productivity) charts.productivity.destroy();
+                charts.productivity = new Chart(prodCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Alex', 'Sarah', 'Marcus', 'Priya', 'David', 'Emma'],
+                        datasets: [{
+                            label: 'Productivity Score',
+                            data: [85, 72, 91, 68, 88, 76],
+                            backgroundColor: colors.purple,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: colors.grid, drawBorder: false } },
+                            x: { grid: { display: false, drawBorder: false } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initReportsCharts() {
+            const colors = getChartColors();
+            
+            const donutCtx = document.getElementById('reportsDonutChart');
+            if(donutCtx) {
+                if(charts.reportsDonut) charts.reportsDonut.destroy();
+                charts.reportsDonut = new Chart(donutCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Completed', 'In Progress', 'Overdue'],
+                        datasets: [{
+                            data: [65, 25, 10],
+                            backgroundColor: [colors.success, colors.primary, '#ef4444'],
+                            borderWidth: 0,
+                            cutout: '75%'
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+                });
+            }
+
+            const barCtx = document.getElementById('reportsBarChart');
+            if(barCtx) {
+                if(charts.reportsBar) charts.reportsBar.destroy();
+                charts.reportsBar = new Chart(barCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                        datasets: [{
+                            label: 'Sales',
+                            data: [1200, 1900, 1500, 2200, 2800],
+                            backgroundColor: colors.primary,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { y: { grid: { color: colors.grid } }, x: { grid: { display: false } } }
+                    }
+                });
+            }
+        }
+
+        // Custom Checkbox Logic
+        document.querySelectorAll('.checkbox-wrapper').forEach(wrapper => {
+            wrapper.addEventListener('click', () => {
+                const cb = wrapper.querySelector('.checkbox');
+                cb.classList.toggle('checked');
+                const icon = cb.querySelector('i');
+                if(cb.classList.contains('checked')) {
+                    icon.style.display = 'block';
+                } else {
+                    icon.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize default view
+        window.onload = () => {
+            initDashboardCharts();
+        };
+
+    </script>
+</body>
+</html>
