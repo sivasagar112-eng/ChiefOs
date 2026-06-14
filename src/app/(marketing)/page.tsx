@@ -94,8 +94,8 @@ export default function MarketingPage() {
         <li><a href="#faq">Blog</a></li>
       </ul>
       <div className="nav-actions">
-        <Link href="login.html" className="nav-login">Log In</Link>
-        <Link href="signup.html" className="nav-start">Start Free</Link>
+        <Link href="/login" className="nav-login">Log In</Link>
+        <Link href="/signup" className="nav-start">Start Free</Link>
       </div>
       <div className="hamburger" id="hamburger" onClick={toggleMenu}>
         <span></span><span></span><span></span>
@@ -109,8 +109,8 @@ export default function MarketingPage() {
   <a href="#pricing" onClick={closeMenu}>Pricing</a>
   <a href="#faq" onClick={closeMenu}>Blog</a>
   <div className="mobile-actions">
-    <Link href="login.html" className="btn-ghost" style={{textAlign: 'center', justifyContent: 'center'}}>Log In</Link>
-    <Link href="signup.html" className="btn-primary" style={{textAlign: 'center', justifyContent: 'center'}}>Start Free</Link>
+    <Link href="/login" className="btn-ghost" style={{textAlign: 'center', justifyContent: 'center'}}>Log In</Link>
+    <Link href="/signup" className="btn-primary" style={{textAlign: 'center', justifyContent: 'center'}}>Start Free</Link>
   </div>
 </div>
 
@@ -123,8 +123,8 @@ export default function MarketingPage() {
       <h1 className="hero-title">Your AI<br /><span className="gradient-text">Chief of Staff</span></h1>
       <p className="hero-sub">Connect your business tools and let AI manage operations, summarize work, track tasks, and surface what matters most.</p>
       <div className="hero-ctas">
-        <Link href="signup.html" className="btn-primary">&#9733; Start Free &mdash; No Credit Card</Link>
-        <Link href="app.html" className="btn-ghost">Watch Demo &rarr;</Link>
+        <Link href="/signup" className="btn-primary">&#9733; Start Free &mdash; No Credit Card</Link>
+        <Link href="/dashboard" className="btn-ghost">Watch Demo &rarr;</Link>
       </div>
       <div className="hero-stats">
         <div className="hero-stat">
@@ -410,7 +410,7 @@ export default function MarketingPage() {
           <div className="pc-feat"><div className="pc-check">&#10003;</div><span>Email intelligence</span></div>
           <div className="pc-feat"><div className="pc-check">&#10003;</div><span>Task tracking</span></div>
         </div>
-        <Link href="signup.html" className="pc-btn outline">Start Free Trial</Link>
+        <Link href="/signup" className="pc-btn outline">Start Free Trial</Link>
       </div>
       <div className="pricing-card pop reveal reveal-delay-2">
         <div className="pop-badge">&#10022; Most Popular</div>
@@ -428,7 +428,7 @@ export default function MarketingPage() {
           <div className="pc-feat"><div className="pc-check">&#10003;</div><span>Priority support</span></div>
           <div className="pc-feat"><div className="pc-check">&#10003;</div><span>Team analytics dashboard</span></div>
         </div>
-        <Link href="signup.html" className="pc-btn filled">Start Free Trial</Link>
+        <Link href="/signup" className="pc-btn filled">Start Free Trial</Link>
       </div>
       <div className="pricing-card reveal reveal-delay-3">
         <div className="pc-tier">Pro</div>
@@ -445,7 +445,7 @@ export default function MarketingPage() {
           <div className="pc-feat"><div className="pc-check">&#10003;</div><span>Dedicated success manager</span></div>
           <div className="pc-feat"><div className="pc-check">&#10003;</div><span>Monthly business reviews</span></div>
         </div>
-        <Link href="signup.html" className="pc-btn outline">Start Free Trial</Link>
+        <Link href="/signup" className="pc-btn outline">Start Free Trial</Link>
       </div>
       <div className="pricing-card reveal reveal-delay-4">
         <div className="pc-tier" style={{color: '#a855f7'}}>Enterprise</div>
@@ -461,7 +461,7 @@ export default function MarketingPage() {
           <div className="pc-feat"><div className="pc-check purple">&#10003;</div><span>SSO &amp; SCIM provisioning</span></div>
           <div className="pc-feat"><div className="pc-check purple">&#10003;</div><span>SOC 2 Type II audit logs</span></div>
         </div>
-        <Link href="signup.html" className="pc-btn ent">Contact Sales &rarr;</Link>
+        <Link href="/signup" className="pc-btn ent">Contact Sales &rarr;</Link>
       </div>
     </div>
     <p style={{textAlign: 'center', marginTop: '28px', fontSize: '13px', color: '#475569'}}>All plans include a 14-day free trial &middot; No credit card required &middot; Cancel anytime</p>
@@ -474,7 +474,7 @@ export default function MarketingPage() {
     <div className="faq-header">
       <div className="section-badge reveal">&#10067; FAQ</div>
       <h2 className="section-title reveal reveal-delay-1">Frequently asked questions</h2>
-      <p className="section-sub reveal reveal-delay-2">Can't find the answer? <a href="signup.html" style={{color: '#3b82f6'}}>Chat with us &rarr;</a></p>
+      <p className="section-sub reveal reveal-delay-2">Can't find the answer? <a href="/signup" style={{color: '#3b82f6'}}>Chat with us &rarr;</a></p>
     </div>
     <div className="faq-list">
       <div className={`faq-item reveal reveal-delay-1 ${openFaq === 0 ? 'open' : ''}`}><button className="faq-q" onClick={() => toggleFaq(0)}>How does ChiefOS integrate with my existing tools?<div className="faq-ico">+</div></button><div className="faq-a">ChiefOS connects via official OAuth integrations &mdash; click to authorize and we read your data securely. No code, no API keys, no IT support needed. Most teams are fully connected in under 10 minutes. We support Gmail, Google Calendar, Sheets, Slack, Stripe, Notion, Linear, HubSpot, and 40+ more.</div></div>
@@ -497,8 +497,8 @@ export default function MarketingPage() {
       <h2 className="section-title reveal reveal-delay-1">Ready to meet your<br /><span className="gradient-text">AI Chief of Staff?</span></h2>
       <p className="section-sub reveal reveal-delay-2">Join 2,400+ businesses already running smarter with ChiefOS. Your first 14 days are completely free.</p>
       <div className="cta-buttons reveal reveal-delay-3">
-        <Link href="signup.html" className="btn-primary cta-btn-main">&#9733; Start Free Today &mdash; No Credit Card Required</Link>
-        <Link href="app.html" className="btn-ghost cta-btn-main">Watch Demo &rarr;</Link>
+        <Link href="/signup" className="btn-primary cta-btn-main">&#9733; Start Free Today &mdash; No Credit Card Required</Link>
+        <Link href="/dashboard" className="btn-ghost cta-btn-main">Watch Demo &rarr;</Link>
       </div>
       <p className="cta-note reveal reveal-delay-4">14-day free trial &middot; No credit card &middot; SOC2 Ready &middot; Cancel anytime</p>
     </div>
@@ -523,7 +523,7 @@ export default function MarketingPage() {
         <div className="footer-col-title">Product</div>
         <div className="footer-links">
           <a href="#features">Features</a><a href="#integrations">Integrations</a>
-          <a href="#pricing">Pricing</a><Link href="app.html">Demo</Link>
+          <a href="#pricing">Pricing</a><Link href="/dashboard">Demo</Link>
           <a href="#">Changelog</a><a href="#">Roadmap</a>
         </div>
       </div>
